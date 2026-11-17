@@ -6,6 +6,8 @@ from config import LOGO_PATH
 from ui.pages.customers import CustomersPage
 from ui.pages.vehicles import VehiclesPage
 from ui.pages.inventory import InventoryPage
+from ui.pages.service import ServicePage
+from ui.pages.settings import SettingsPage
 
 
 
@@ -95,6 +97,10 @@ class MainWindow(QMainWindow):
                 page = VehiclesPage()
             elif page_name == "Inventory":
                 page = InventoryPage()
+            elif page_name == "Service":
+                page = ServicePage()
+            elif page_name == "Settings":
+                page = SettingsPage()
             else:
                 page = QWidget()
                 page_layout = QVBoxLayout(page)
