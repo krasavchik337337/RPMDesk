@@ -1,11 +1,5 @@
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QPushButton,
-    QLabel,
-    QButtonGroup, QHBoxLayout
-)
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QButtonGroup, QHBoxLayout
 from PyQt6.QtCore import pyqtSignal, Qt
 from config import LOGO_PATH
 

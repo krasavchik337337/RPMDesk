@@ -2,8 +2,6 @@ from database.connection import get_connection
 from config import DEFAULT_SETTINGS
 
 
-
-
 def initialize_settings():
     con = get_connection()
 

@@ -34,22 +34,22 @@ class ReportsPage(QWidget):
         self.report_combo = QComboBox()
 
         self.report_combo.addItem(
-            "Service History Report",
+            "Отчет по истории обслуживания",
             "service_history"
         )
 
         self.report_combo.addItem(
-            "Service Statistics Report",
+            "Отчет по статистике услуг",
             "service_statistics"
         )
 
         self.report_combo.addItem(
-            "Inventory Balance Report",
+            "Отчет по остаткам на складе",
             "inventory_balance"
         )
 
         self.report_combo.addItem(
-            "Stock Movements Report",
+            "Отчет по движению товаров",
             "stock_movements"
         )
 
@@ -84,28 +84,28 @@ class ReportsPage(QWidget):
         self.vehicle_combo = QComboBox()
 
         filters_layout.addWidget(
-            QLabel("Date from:"), 0, 0
+            QLabel("Дата с:"), 0, 0
         )
         filters_layout.addWidget(
             self.date_from, 0, 1
         )
 
         filters_layout.addWidget(
-            QLabel("Date to:"), 0, 2
+            QLabel("Дата по:"), 0, 2
         )
         filters_layout.addWidget(
             self.date_to, 0, 3
         )
 
         filters_layout.addWidget(
-            QLabel("Customer:"), 1, 0
+            QLabel("Клиент:"), 1, 0
         )
         filters_layout.addWidget(
             self.customer_combo, 1, 1
         )
 
         filters_layout.addWidget(
-            QLabel("Vehicle:"), 1, 2
+            QLabel("Автомобиль:"), 1, 2
         )
         filters_layout.addWidget(
             self.vehicle_combo, 1, 3
@@ -122,7 +122,7 @@ class ReportsPage(QWidget):
         info_title.setObjectName("section_title")
 
         self.info_label = QLabel(
-            "Select a report and configure its filters."
+            "Выберите отчет и настройте фильтры."
         )
         self.info_label.setObjectName("search_label")
         self.info_label.setWordWrap(True)
@@ -138,7 +138,7 @@ class ReportsPage(QWidget):
         self.recipient_input = QLineEdit()
         self.recipient_input.setPlaceholderText("Адрес почты получателя")
 
-        self.send_email_button = QPushButton("Send email")
+        self.send_email_button = QPushButton("Отправить")
         self.send_email_button.setEnabled(False)
         self.send_email_button.clicked.connect(self.send_report_email)
 
@@ -153,13 +153,9 @@ class ReportsPage(QWidget):
         self.generate_button.setObjectName("primary_button")
         self.generate_button.clicked.connect(self.generate_csv)
 
-        self.refresh_button = QPushButton(
-            "Сбросить фильтры"
-        )
+        self.refresh_button = QPushButton("Сбросить фильтры")
 
-        self.refresh_button.clicked.connect(
-            self.refresh_filters
-        )
+        self.refresh_button.clicked.connect(self.refresh_filters)
 
         buttons_layout.addWidget(self.refresh_button)
         buttons_layout.addStretch()
@@ -174,7 +170,7 @@ class ReportsPage(QWidget):
         self.customer_combo.blockSignals(True)
 
         self.customer_combo.clear()
-        self.customer_combo.addItem("All customers", None)
+        self.customer_combo.addItem("Все клиенты", None)
 
         customers = reports_repository.get_report_customers()
 
@@ -193,7 +189,7 @@ class ReportsPage(QWidget):
 
     def load_vehicles(self):
         self.vehicle_combo.clear()
-        self.vehicle_combo.addItem("All vehicles", None)
+        self.vehicle_combo.addItem("Все автомобили", None)
 
         customer_id = self.customer_combo.currentData()
 
@@ -235,20 +231,16 @@ class ReportsPage(QWidget):
 
         descriptions = {
             "service_history": (
-                "Shows completed service visits, "
-                "performed works and used parts."
+                "Показывает завершенные визиты на обслуживание."
             ),
             "service_statistics": (
-                "Shows visit count, popular works "
-                "and service activity over time."
+                "Показывает статистику визитов."
             ),
             "inventory_balance": (
-                "Shows current stock quantities "
-                "and products with low stock."
+                "Показывает текущие остатки на складе."
             ),
             "stock_movements": (
-                "Shows stock receipts, write-offs "
-                "and quantity corrections."
+                "Показывает складские операции."
             )
         }
 
@@ -277,7 +269,7 @@ class ReportsPage(QWidget):
             QMessageBox.warning(
                 self,
                 "Invalid period",
-                "The start date cannot be later than the end date."
+                "Дата начала не может быть позже даты окончания."
             )
             return
 
@@ -317,7 +309,7 @@ class ReportsPage(QWidget):
             QMessageBox.information(
                 self,
                 "Export completed",
-                f"CSV report successfully saved:\n{output_path}"
+                f"Отчет успешно сохранен:\n{output_path}"
             )
 
         except Exception as error:
@@ -336,7 +328,7 @@ class ReportsPage(QWidget):
             QMessageBox.warning(
                 self,
                 "Missing recipient",
-                "Enter the recipient email address."
+                "Введите адрес получателя."
             )
             return
 
@@ -344,14 +336,11 @@ class ReportsPage(QWidget):
             QMessageBox.warning(
                 self,
                 "No report",
-                "Generate a CSV report first."
+                "Сначала сформируйте отчет."
             )
             return
 
         settings = get_all_settings()
-        print("SMTP HOST:", repr(settings.get("smtp_host")))
-        print("SMTP PORT:", repr(settings.get("smtp_port")))
-        print("SMTP SECURITY:", repr(settings.get("smtp_security")))
 
         try:
             sender = EmailSender(
@@ -364,20 +353,20 @@ class ReportsPage(QWidget):
 
             sender.send_email(
                 recipient=recipient,
-                subject="RPMDesk report",
-                body="Please find the requested report attached.",
+                subject="Отчет RPMDesk",
+                body="Запрошенный отчет находится во вложении.",
                 attachment_path=self.last_report_path
             )
 
             QMessageBox.information(
                 self,
                 "Email sent",
-                "The report has been sent successfully."
+                "Отчет успешно отправлен."
             )
 
         except Exception as error:
             QMessageBox.critical(
                 self,
                 "Email error",
-                f"Could not send the report:\n{error}"
+                f"Не удалось отправить отчёт:\n{error}"
             )

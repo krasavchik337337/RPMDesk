@@ -1,9 +1,4 @@
-from PyQt6.QtWidgets import (
-    QWidget,
-    QHBoxLayout,
-    QLabel
-)
-
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 
 class Header(QWidget):

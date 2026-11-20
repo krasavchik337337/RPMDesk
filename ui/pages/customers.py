@@ -107,7 +107,7 @@ class CustomersPage(QWidget):
         if row < 0:
             QMessageBox.warning(
                 self,
-                "Предупреждение",
+                "Warning",
                 "Выберите клиента."
             )
             return
@@ -134,13 +134,13 @@ class CustomersPage(QWidget):
 
             QMessageBox.information(
                 self,
-                "Успешно",
+                "Successful",
                 "Клиент деактивирован."
             )
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "Ошибка",
+                "Error",
                 f"Не удалось деактивировать клиента:\n{error}"
             )
 

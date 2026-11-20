@@ -10,7 +10,7 @@ def request_json(url, headers=None):
     request = Request(url, headers=headers or {})
 
     try:
-        with urlopen(url, timeout=15) as response:
+        with urlopen(request, timeout=15) as response:
             return json.loads(response.read().decode("utf-8"))
 
     except HTTPError as error:

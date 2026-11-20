@@ -41,7 +41,7 @@ class CustomerDialog(QDialog):
         if not first_name or not last_name or not phone:
             QMessageBox.warning(
                 self,
-                "Ошибка",
+                "Error",
                 "Заполни имя, фамилию и телефон."
             )
             return
@@ -58,14 +58,14 @@ class CustomerDialog(QDialog):
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "Ошибка базы данных",
+                "Database error",
                 str(error)
             )
             return
 
         QMessageBox.information(
             self,
-            "Успешно",
+            "Successful",
             "Клиент добавлен."
         )
 

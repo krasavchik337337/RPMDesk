@@ -1,9 +1,7 @@
-
 from database.connection import get_connection
 
 
 def get_report_customers():
-    """Return active customers for report filters."""
     con = get_connection()
 
     try:
@@ -19,7 +17,6 @@ def get_report_customers():
 
 
 def get_report_vehicles(customer_id=None):
-    """Return active vehicles, optionally filtered by customer."""
     con = get_connection()
 
     try:
@@ -49,7 +46,6 @@ def get_service_history_report(
         customer_id=None,
         vehicle_id=None
 ):
-    """Return completed service records with works and used parts."""
     query = """
         SELECT
             sr.id,
@@ -120,7 +116,6 @@ def get_service_statistics_report(
         customer_id=None,
         vehicle_id=None
 ):
-    """Return service statistics, popular works and monthly activity."""
     conditions = [
         "date(sr.service_date) BETWEEN ? AND ?"
     ]
@@ -188,7 +183,6 @@ def get_service_statistics_report(
 
 
 def get_inventory_balance_report():
-    """Return inventory items and their calculated stock balances."""
     con = get_connection()
 
     try:
@@ -233,7 +227,6 @@ def get_stock_movements_report(
         customer_id=None,
         vehicle_id=None
 ):
-    """Return stock movements with optional service filters."""
     query = """
         SELECT
             sm.id,

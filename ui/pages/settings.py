@@ -33,8 +33,13 @@ class SettingsPage(QWidget):
             "Email"
         ])
 
-        for function in [self.create_general_page, self.create_appearance_page, self.create_api_page,
-                         self.create_database_page, self.create_email_page]:
+        for function in [
+            self.create_general_page,
+            self.create_appearance_page,
+            self.create_api_page,
+            self.create_database_page,
+            self.create_email_page
+        ]:
             function()
 
         content_layout.addWidget(self.menu)
@@ -46,7 +51,7 @@ class SettingsPage(QWidget):
 
         bottom_layout.addStretch()
 
-        self.save_button = QPushButton("Save changes")
+        self.save_button = QPushButton("Сохранить изменения")
         self.save_button.clicked.connect(self.save_settings)
 
         bottom_layout.addWidget(self.save_button)
@@ -90,10 +95,10 @@ class SettingsPage(QWidget):
         self.phone_input = QLineEdit()
         self.email_input = QLineEdit()
 
-        form.addRow("Service name:", self.service_name_input)
-        form.addRow("Organization:", self.organization_input)
-        form.addRow("Address:", self.address_input)
-        form.addRow("Phone:", self.phone_input)
+        form.addRow("Название сервиса:", self.service_name_input)
+        form.addRow("Организация:", self.organization_input)
+        form.addRow("Адрес:", self.address_input)
+        form.addRow("Телефон:", self.phone_input)
         form.addRow("Email:", self.email_input)
 
         layout.addWidget(group)
@@ -109,7 +114,7 @@ class SettingsPage(QWidget):
         self.theme_combo.addItem("Dark", "dark")
         self.theme_combo.addItem("Light", "light")
 
-        form.addRow("Theme:", self.theme_combo)
+        form.addRow("Тема:", self.theme_combo)
 
         layout.addWidget(group)
         layout.addStretch()
@@ -140,14 +145,12 @@ class SettingsPage(QWidget):
         group_layout = QVBoxLayout(group)
 
         description = QLabel(
-            "Create a manual backup of the RPMDesk database."
+            "Создать резервную копию базы данных RPMDesk вручную."
         )
         description.setWordWrap(True)
 
-        self.backup_button = QPushButton("Create backup")
-        self.backup_button.clicked.connect(
-            self.create_backup
-        )
+        self.backup_button = QPushButton("Создать копию")
+        self.backup_button.clicked.connect(self.create_backup)
 
         group_layout.addWidget(description)
         group_layout.addWidget(self.backup_button)
@@ -172,13 +175,13 @@ class SettingsPage(QWidget):
         self.smtp_security_combo = QComboBox()
         self.smtp_security_combo.addItem("STARTTLS", "starttls")
         self.smtp_security_combo.addItem("SSL/TLS", "ssl")
-        self.smtp_security_combo.addItem("None", "none")
+        self.smtp_security_combo.addItem("Без шифрования", "none")
 
-        form.addRow("SMTP server:", self.smtp_host_input)
-        form.addRow("Port:", self.smtp_port_input)
-        form.addRow("Username:", self.smtp_username_input)
-        form.addRow("Password:", self.smtp_password_input)
-        form.addRow("Encryption:", self.smtp_security_combo)
+        form.addRow("SMTP-сервер:", self.smtp_host_input)
+        form.addRow("Порт:", self.smtp_port_input)
+        form.addRow("Имя пользователя:", self.smtp_username_input)
+        form.addRow("Пароль:", self.smtp_password_input)
+        form.addRow("Шифрование:", self.smtp_security_combo)
 
         layout.addWidget(group)
 
@@ -260,7 +263,7 @@ class SettingsPage(QWidget):
             QMessageBox.critical(
                 self,
                 "Save error",
-                f"Could not save settings:\n{error}"
+                f"Не получилось сохранить настройки:\n{error}"
             )
             return
 
@@ -270,7 +273,7 @@ class SettingsPage(QWidget):
         QMessageBox.information(
             self,
             "Settings",
-            "Settings have been saved."
+            "Настройки успешно сохранены."
         )
 
     def create_backup(self):
@@ -296,14 +299,14 @@ class SettingsPage(QWidget):
             QMessageBox.information(
                 self,
                 "Backup",
-                "Database backup created successfully."
+                "Резервная копия базы данных успешна сохранена."
             )
 
         except Exception as error:
             QMessageBox.critical(
                 self,
                 "Backup error",
-                f"Could not create backup:\n{error}"
+                f"Не удалось сохранить копию базы данных:\n{error}"
             )
 
         finally:

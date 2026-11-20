@@ -41,6 +41,7 @@ def get_all_vehicles():
 
     return vehicles
 
+
 def deactivate_vehicle(vehicle_id):
     con = get_connection()
 

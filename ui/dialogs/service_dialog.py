@@ -1,22 +1,7 @@
-from PyQt6.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QHBoxLayout,
-    QFormLayout,
-    QGroupBox,
-    QComboBox,
-    QLineEdit,
-    QSpinBox,
-    QPushButton,
-    QTableWidget,
-    QTableWidgetItem,
-    QHeaderView,
-    QDialogButtonBox,
-    QMessageBox
-)
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QFormLayout, QGroupBox, QComboBox, QLineEdit, QSpinBox, \
+    QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QDialogButtonBox, QMessageBox
 from PyQt6.QtGui import QIntValidator
 from PyQt6.QtCore import Qt
-
 from database.connection import get_connection
 from database.work_types_repository import get_work_types
 from database.inventory_repository import get_inventory_items
@@ -276,7 +261,7 @@ class ServiceDialog(QDialog):
         if work_type_id is None:
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "Сначала добавьте виды работ в справочник."
             )
             return
@@ -315,7 +300,7 @@ class ServiceDialog(QDialog):
         if inventory_id is None:
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "На складе пока нет товаров."
             )
             return
@@ -372,7 +357,7 @@ class ServiceDialog(QDialog):
         if customer_id is None:
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "Выберите клиента."
             )
             return
@@ -380,7 +365,7 @@ class ServiceDialog(QDialog):
         if vehicle_id is None:
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "У выбранного клиента нет активного автомобиля."
             )
             return
@@ -388,7 +373,7 @@ class ServiceDialog(QDialog):
         if self.works_table.rowCount() == 0:
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "Добавьте хотя бы одну выполненную работу."
             )
             return
@@ -472,7 +457,7 @@ class ServiceDialog(QDialog):
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "Ошибка",
+                "Error",
                 (
                     "Не удалось сохранить обслуживание.\n\n"
                     f"{error}"

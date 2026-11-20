@@ -150,7 +150,6 @@ class DashboardPage(QWidget):
         return card, value
 
     def load_dashboard(self):
-        """Load all dashboard information."""
         self.load_organization()
         self.load_statistics()
         self.load_latest_service()
@@ -199,7 +198,7 @@ class DashboardPage(QWidget):
 
         if service is None:
             self.latest_service_label.setText(
-                "No service records yet."
+                "Записей об обслуживании пока нет."
             )
             return
 
@@ -216,14 +215,14 @@ class DashboardPage(QWidget):
             vehicle += f' ({service["year"]})'
 
         details = [
-            f'Date: {service["service_date"]}',
-            f'Customer: {customer}',
-            f'Vehicle: {vehicle}'
+            f'Дата: {service["service_date"]}',
+            f'Клиент: {customer}',
+            f'Автомобиль: {vehicle}'
         ]
 
         if service["mileage"] is not None:
             details.append(
-                f'Mileage: {service["mileage"]}'
+                f'Пробег: {service["mileage"]}'
             )
 
         self.latest_service_label.setText(

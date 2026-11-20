@@ -26,7 +26,6 @@ def write_section(writer, title, headers, rows):
 
     for row in rows:
         writer.writerow(row)
-
     writer.writerow([])
 
 

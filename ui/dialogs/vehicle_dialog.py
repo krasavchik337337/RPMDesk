@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QWidget, QFormLayout, QComboBox, QLineEdit, QTextEdit, QPushButton, \
-    QMessageBox, QDialogButtonBox, QMessageBox, QLabel, QHBoxLayout
+    QDialogButtonBox, QMessageBox, QLabel, QHBoxLayout
 from database.vehicles_repository import add_vehicle
 from database.customers_repository import get_customers_by_name, get_customer_by_id
 from vin.decoder import decode_vin

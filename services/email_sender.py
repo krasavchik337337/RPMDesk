@@ -22,6 +22,7 @@ class EmailSender:
         message["From"] = self.username
         message["To"] = recipient
         message["Subject"] = subject
+        message.set_content(body)
 
         with attachment_path.open("rb") as file:
             message.add_attachment(
@@ -36,7 +37,7 @@ class EmailSender:
         if self.security == "ssl":
             server = smtplib.SMTP_SSL(
                 self.host,
-                self.host,
+                self.port,
                 context=context,
                 timeout=20
             )

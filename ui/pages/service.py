@@ -1,15 +1,5 @@
-from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QPushButton,
-    QTableWidget,
-    QTableWidgetItem,
-    QHeaderView,
-    QMessageBox,
-    QDialog
-)
-
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, \
+    QMessageBox, QDialog
 from database.service_repository import get_service_history
 from ui.dialogs.service_dialog import ServiceDialog
 

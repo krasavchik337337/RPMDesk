@@ -1,29 +1,9 @@
-from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QPushButton,
-    QTableWidget,
-    QTableWidgetItem,
-    QHeaderView,
-    QMessageBox,
-    QDialog,
-    QFormLayout,
-    QLineEdit,
-    QComboBox,
-    QSpinBox,
-    QDialogButtonBox,
-    QLabel,
-    QAbstractItemView
-)
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, \
+    QMessageBox, QDialog, QFormLayout, QLineEdit, QComboBox, QSpinBox, QDialogButtonBox, QLabel, QAbstractItemView
 from PyQt6.QtCore import Qt
-
-from database.inventory_repository import (
-    add_inventory_item,
-    get_inventory_items,
-    add_stock_movement,
+from database.inventory_repository import add_inventory_item, get_inventory_items, add_stock_movement, \
     get_stock_movements
-)
+from ui.dialogs.inventory_dialogs import AddInventoryDialog, StockMovementDialog, MovementHistoryDialog
 
 
 class AddInventoryDialog(QDialog):
@@ -72,7 +52,7 @@ class AddInventoryDialog(QDialog):
         if not self.name_input.text().strip():
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "Введите название товара."
             )
             return
@@ -80,7 +60,7 @@ class AddInventoryDialog(QDialog):
         if not self.category_input.text().strip():
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "Введите категорию товара."
             )
             return
@@ -113,9 +93,7 @@ class StockMovementDialog(QDialog):
         form = QFormLayout()
 
         self.item_label = QLabel(item["name"])
-        self.stock_label = QLabel(
-            f'{item["stock"]} {unit}'
-        )
+        self.stock_label = QLabel(f'{item["stock"]} {unit}')
 
         self.type_combo = QComboBox()
         self.type_combo.addItem("Поступление", "receipt")
@@ -188,11 +166,9 @@ class MovementHistoryDialog(QDialog):
         self.table.setEditTriggers(
             QTableWidget.EditTrigger.NoEditTriggers
         )
-
         self.table.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
         )
-
         self.table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )
@@ -249,14 +225,10 @@ class InventoryPage(QWidget):
         self.change_quantity_button = QPushButton(
             "Изменить количество"
         )
-        self.change_quantity_button.clicked.connect(
-            self.change_quantity
-        )
+        self.change_quantity_button.clicked.connect(self.change_quantity)
 
         self.history_button = QPushButton("История движений")
-        self.history_button.clicked.connect(
-            self.show_history
-        )
+        self.history_button.clicked.connect(self.show_history)
 
         buttons_layout.addWidget(self.add_button)
         buttons_layout.addWidget(self.change_quantity_button)
@@ -281,15 +253,12 @@ class InventoryPage(QWidget):
         self.table.setEditTriggers(
             QTableWidget.EditTrigger.NoEditTriggers
         )
-
         self.table.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
         )
-
         self.table.setSelectionMode(
             QAbstractItemView.SelectionMode.SingleSelection
         )
-
         self.table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )
@@ -338,7 +307,7 @@ class InventoryPage(QWidget):
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "Ошибка",
+                "Error",
                 f"Не удалось загрузить склад:\n{error}"
             )
 
@@ -363,7 +332,7 @@ class InventoryPage(QWidget):
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "Ошибка",
+                "Error",
                 f"Не удалось добавить товар:\n{error}"
             )
 
@@ -373,7 +342,7 @@ class InventoryPage(QWidget):
         if row < 0:
             QMessageBox.warning(
                 self,
-                "Внимание",
+                "Warning",
                 "Сначала выберите товар."
             )
             return
@@ -396,7 +365,7 @@ class InventoryPage(QWidget):
             if selected_item is None:
                 QMessageBox.warning(
                     self,
-                    "Внимание",
+                    "Warning",
                     "Товар не найден."
                 )
                 return
@@ -423,7 +392,7 @@ class InventoryPage(QWidget):
         except Exception as error:
             QMessageBox.critical(
                 self,
-                "Ошибка",
+                "Error",
                 f"Не удалось изменить количество:\n{error}"
             )
 
