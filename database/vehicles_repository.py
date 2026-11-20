@@ -32,6 +32,7 @@ def get_all_vehicles():
             FROM vehicles
             JOIN customers ON customers.id = vehicles.customer_id
             WHERE customers.is_active = 1
+                AND vehicles.is_active = 1
             ORDER BY vehicles.id DESC
         """).fetchall()
 
@@ -39,3 +40,22 @@ def get_all_vehicles():
         con.close()
 
     return vehicles
+
+def deactivate_vehicle(vehicle_id):
+    con = get_connection()
+
+    try:
+        con.execute("""
+            UPDATE vehicles
+            SET is_active = 0
+            WHERE id = ?
+        """, (vehicle_id,))
+
+        con.commit()
+
+    except Exception:
+        con.rollback()
+        raise
+
+    finally:
+        con.close()

@@ -8,68 +8,24 @@ from ui.pages.vehicles import VehiclesPage
 from ui.pages.inventory import InventoryPage
 from ui.pages.service import ServicePage
 from ui.pages.settings import SettingsPage
-
+from ui.pages.reports import ReportsPage
+from ui.pages.dashboard import DashboardPage
+from ui.themes import get_stylesheet
+from database.settings_repository import get_all_settings
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle("RPMDesk")
         self.setWindowIcon(QIcon(LOGO_PATH))
-        self.setMinimumSize(1100, 700)
+        self.setMinimumSize(1100, 800)
         self.resize(1400, 850)
-
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #111827;
-            }
-
-            QWidget#sidebar {
-                background-color: #1F2937;
-            }
-
-            QLabel#logo {
-                color: #FFFFFF;
-                font-size: 24px;
-                font-weight: bold;
-            }
-
-            QPushButton#nav_button {
-                background-color: transparent;
-                color: #9CA3AF;
-                border: none;
-                border-radius: 7px;
-                padding: 13px;
-                text-align: left;
-                font-size: 14px;
-            }
-
-            QPushButton#nav_button:hover {
-                background-color: #374151;
-                color: #FFFFFF;
-            }
-
-            QPushButton#nav_button:checked {
-                background-color: #2563EB;
-                color: #FFFFFF;
-            }
-
-            QLabel#page_title {
-                color: #FFFFFF;
-                font-size: 22px;
-                font-weight: bold;
-            }
-
-            QLabel#placeholder, QLabel#search_label {
-                color: #9CA3AF;
-                font-size: 18px;
-            }
-        """)
+        self.apply_theme()
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -101,15 +57,11 @@ class MainWindow(QMainWindow):
                 page = ServicePage()
             elif page_name == "Settings":
                 page = SettingsPage()
-            else:
-                page = QWidget()
-                page_layout = QVBoxLayout(page)
-
-                label = QLabel(f"{page_name} page")
-                label.setObjectName("placeholder")
-
-                page_layout.addWidget(label)
-                page_layout.addStretch()
+                page.theme_changed.connect(self.apply_theme)
+            elif page_name == "Reports":
+                page = ReportsPage()
+            elif page_name == "Dashboard":
+                page = DashboardPage()
 
             self.pages.addWidget(page)
 
@@ -125,4 +77,14 @@ class MainWindow(QMainWindow):
         self.pages.setCurrentIndex(index)
 
         page_name = self.sidebar.pages[index]
+        current_page = self.pages.widget(index)
         self.header.set_title(page_name)
+
+        refresh_method = getattr(current_page, "refresh_data", None)
+
+        if callable(refresh_method):
+            refresh_method()
+
+    def apply_theme(self):
+        theme = get_all_settings().get("theme")
+        self.setStyleSheet(get_stylesheet(theme))

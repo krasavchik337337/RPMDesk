@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, \
-    QLineEdit, QLabel
+    QLineEdit, QLabel, QMessageBox
 from ui.dialogs.customer_dialog import CustomerDialog
-from database.customers_repository import get_all_customers
+from database.customers_repository import get_all_customers, deactivate_client
 
 
 class CustomersPage(QWidget):
@@ -26,8 +26,12 @@ class CustomersPage(QWidget):
         add_button = QPushButton("Добавить клиента")
         add_button.clicked.connect(self.open_add_dialog)
 
+        deactivate_button = QPushButton("Удалить клиента")
+        deactivate_button.clicked.connect(self.deactivate_client)
+
         top_layout.addWidget(search_label)
         top_layout.addWidget(self.search_input)
+        top_layout.addWidget(deactivate_button)
         top_layout.addWidget(add_button)
 
         layout.addLayout(top_layout)
@@ -46,6 +50,12 @@ class CustomersPage(QWidget):
         )
         self.table.setEditTriggers(
             QTableWidget.EditTrigger.NoEditTriggers
+        )
+        self.table.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
+        self.table.setSelectionMode(
+            QTableWidget.SelectionMode.SingleSelection
         )
 
         layout.addWidget(self.table)
@@ -90,3 +100,49 @@ class CustomersPage(QWidget):
 
         if dialog.exec():
             self.load_customers()
+
+    def deactivate_client(self):
+        row = self.table.currentRow()
+
+        if row < 0:
+            QMessageBox.warning(
+                self,
+                "Предупреждение",
+                "Выберите клиента."
+            )
+            return
+
+        customer_id = int(
+            self.table.item(row, 0).text()
+        )
+
+        answer = QMessageBox.question(
+            self,
+            "Подтверждение",
+            "Вы действительно хотите деактивировать "
+            "этого клиента?",
+            QMessageBox.StandardButton.Yes
+            | QMessageBox.StandardButton.No
+        )
+
+        if answer != QMessageBox.StandardButton.Yes:
+            return
+
+        try:
+            deactivate_client(customer_id)
+            self.load_customers()
+
+            QMessageBox.information(
+                self,
+                "Успешно",
+                "Клиент деактивирован."
+            )
+        except Exception as error:
+            QMessageBox.critical(
+                self,
+                "Ошибка",
+                f"Не удалось деактивировать клиента:\n{error}"
+            )
+
+    def refresh_data(self):
+        self.load_customers()

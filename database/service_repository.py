@@ -1,181 +1,140 @@
 import sqlite3
 from database.connection import get_connection
 
+
 def create_service_record(
-    customer_id,
-    vehicle_id,
-    mileage,
-    notes,
-    works,
-    parts
+        customer_id,
+        vehicle_id,
+        mileage,
+        notes,
+        works,
+        parts
 ):
-    """
-    works:
-        [
-            {
-                "work_type_id": 1,
-                "name": "Замена масла",
-                "quantity": 1,
-                "unit_price": 150000
-            }
-        ]
-
-    parts:
-        [
-            {
-                "inventory_id": 2,
-                "quantity": 5000
-            }
-        ]
-
-    Все цены указаны в копейках.
-    Количество деталей — в штуках или миллилитрах.
-    """
     if not works:
-        raise ValueError("Добавьте хотя бы одну выполненную работу")
-
-    total_cost = 0
-
-    for work in works:
-        if work["unit_price"] < 0:
-            raise ValueError("Цена работы не может быть отрицательной")\
-
-        total_cost += work["quantity"] * work["unit_price"]
+        raise ValueError(
+            "Добавьте хотя бы одну выполненную работу"
+        )
 
     con = get_connection()
-    vehicle = con.execute(
-        """
-        SELECT id
-        FROM vehicles
-        WHERE id = ?
-          AND customer_id = ?
-          AND is_active = 1
-        """,
-        (vehicle_id, customer_id)
-    ).fetchone()
 
-    if vehicle is None:
-        raise ValueError("Автомобиль не найден или не принадлежит этому клиенту")
+    try:
+        vehicle = con.execute("""
+            SELECT id
+            FROM vehicles
+            WHERE id = ?
+              AND customer_id = ?
+              AND is_active = 1
+        """, (vehicle_id, customer_id)).fetchone()
 
-    cur = con.execute(
-        """
-        INSERT INTO service_records (
-            customer_id,
-            vehicle_id,
-            mileage,
-            notes,
-            total_cost
-        )
-        VALUES (?, ?, ?, ?, 0)
-        """,
-        (customer_id, vehicle_id, mileage, notes)
-    )
-
-    service_record_id = cur.lastrowid
-
-    for work in works:
-        quantity = work["quantity"]
-        unit_price = work["unit_price"]
-        work_total = quantity * unit_price
-
-        con.execute(
-            """
-            INSERT INTO service_works (
-                service_record_id,
-                work_type_id,
-                name,
-                quantity,
-                unit_price,
-                total_price
+        if vehicle is None:
+            raise ValueError(
+                "Автомобиль не найден или не принадлежит этому клиенту"
             )
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
+
+        customer = con.execute("""
+            SELECT id
+            FROM customers
+            WHERE id = ? AND is_active = 1
+        """, (customer_id,)).fetchone()
+
+        if customer is None:
+            raise ValueError("Клиент не найден или деактивирован")
+
+        cursor = con.execute("""
+            INSERT INTO service_records (
+                customer_id,
+                vehicle_id,
+                mileage,
+                notes
+            )
+            VALUES (?, ?, ?, ?)
+        """, (customer_id, vehicle_id, mileage, notes))
+
+        service_record_id = cursor.lastrowid
+
+        for work in works:
+            if work["quantity"] <= 0:
+                raise ValueError(
+                    "Количество работ должно быть больше нуля"
+                )
+
+            con.execute("""
+                INSERT INTO service_works (
+                    service_record_id,
+                    work_type_id,
+                    name,
+                    quantity
+                )
+                VALUES (?, ?, ?, ?)
+            """, (
                 service_record_id,
                 work.get("work_type_id"),
                 work["name"],
-                quantity,
-                unit_price,
-                work_total
-            )
-        )
+                work["quantity"]
+            ))
 
-    for part in parts:
-        inventory_id = part["inventory_id"]
-        quantity = part["quantity"]
+        for part in parts:
+            inventory_id = part["inventory_id"]
+            quantity = part["quantity"]
 
-        item = con.execute(
-            """
-            SELECT id, unit_price
-            FROM inventory
-            WHERE id = ?
-            """,
-            (inventory_id,)
-        ).fetchone()
+            if quantity <= 0:
+                raise ValueError(
+                    "Количество деталей должно быть больше нуля"
+                )
 
-        if item is None:
-            raise ValueError("Товар не найден")
+            item = con.execute("""
+                SELECT id
+                FROM inventory
+                WHERE id = ?
+            """, (inventory_id,)).fetchone()
 
-        unit_price = item["unit_price"]
-        part_total = quantity * unit_price
+            if item is None:
+                raise ValueError("Товар не найден")
 
-        movement_cur = con.execute(
-            """
-            INSERT INTO stock_movements (
-                inventory_id,
-                movement_type,
-                quantity,
-                unit_price,
-                service_record_id,
-                note
-            )
-            VALUES (?, 'write_off', ?, ?, ?, ?)
-            """,
-            (
+            movement_cursor = con.execute("""
+                INSERT INTO stock_movements (
+                    inventory_id,
+                    movement_type,
+                    quantity,
+                    service_record_id,
+                    note
+                )
+                VALUES (
+                    ?, 'write_off', ?, ?,
+                    'Списание при проведении обслуживания'
+                )
+            """, (
                 inventory_id,
                 quantity,
-                unit_price,
-                service_record_id,
-                "Списание при проведении обслуживания"
-            )
-        )
+                service_record_id
+            ))
 
-        stock_movement_id = movement_cur.lastrowid
+            stock_movement_id = movement_cursor.lastrowid
 
-        con.execute(
-            """
-            INSERT INTO used_parts (
-                service_record_id,
-                inventory_id,
-                stock_movement_id,
-                quantity,
-                unit_price,
-                total_price
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
+            con.execute("""
+                INSERT INTO used_parts (
+                    service_record_id,
+                    inventory_id,
+                    stock_movement_id,
+                    quantity
+                )
+                VALUES (?, ?, ?, ?)
+            """, (
                 service_record_id,
                 inventory_id,
                 stock_movement_id,
-                quantity,
-                unit_price,
-                part_total
-            )
-        )
+                quantity
+            ))
 
-        total_cost += part_total
+        con.commit()
+        return service_record_id
 
-    con.execute(
-        """
-        UPDATE service_records
-        SET total_cost = ?
-        WHERE id = ?
-        """,
-        (total_cost, service_record_id)
-    )
+    except Exception:
+        con.rollback()
+        raise
 
-    return service_record_id
+    finally:
+        con.close()
 
 
 def get_service_history(customer_id=None, vehicle_id=None):

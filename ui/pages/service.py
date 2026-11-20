@@ -1,6 +1,17 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, \
-    QLineEdit, QLabel, QMessageBox
+from PyQt6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
+    QMessageBox,
+    QDialog
+)
+
 from database.service_repository import get_service_history
+from ui.dialogs.service_dialog import ServiceDialog
 
 
 class ServicePage(QWidget):
@@ -13,27 +24,26 @@ class ServicePage(QWidget):
 
         buttons_layout = QHBoxLayout()
 
-        self.refresh_button = QPushButton("Обновить")
-        self.refresh_button.clicked.connect(self.load_history)
+        self.add_button = QPushButton("Новое обслуживание")
+        self.add_button.clicked.connect(self.open_service_dialog)
 
-        buttons_layout.addStretch()
-        buttons_layout.addWidget(self.refresh_button)
+        buttons_layout.addWidget(self.add_button)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(7)
+        self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels([
             "Дата",
             "Клиент",
             "Автомобиль",
             "Год",
             "Пробег",
-            "Стоимость",
             "Примечания"
         ])
 
         self.table.setEditTriggers(
             QTableWidget.EditTrigger.NoEditTriggers
         )
+
         self.table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )
@@ -42,6 +52,12 @@ class ServicePage(QWidget):
         layout.addWidget(self.table)
 
         self.load_history()
+
+    def open_service_dialog(self):
+        dialog = ServiceDialog(self)
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.load_history()
 
     def load_history(self):
         try:
@@ -59,7 +75,6 @@ class ServicePage(QWidget):
                     f'{record["make"]} {record["model"]}',
                     str(record["year"] or "—"),
                     str(record["mileage"] or "—"),
-                    f'{record["total_cost"] / 100:.2f} ₽',
                     record["notes"] or "—"
                 ]
 
@@ -76,3 +91,6 @@ class ServicePage(QWidget):
                 "Ошибка",
                 f"Не удалось загрузить историю обслуживания:\n{error}"
             )
+
+    def refresh_data(self):
+        self.load_history()

@@ -2,14 +2,8 @@ import json
 from urllib.error import URLError, HTTPError
 from urllib.parse import quote
 from urllib.request import urlopen, Request
-from config import PLAN_PARTS_TOKEN
-
-NHTSA_URL = (
-    "https://vpic.nhtsa.dot.gov/api/vehicles/"
-    "DecodeVinValuesExtended/{}?format=json"
-)
-WENMAR_URL = "https://open.wenmarpro.com/v1/vin/{}"
-DBVIN_URL = "https://db.vin/api/v1/vin/{}"
+from config import NHTSA_URL, DBVIN_URL, WENMAR_URL
+from database.settings_repository import get_setting
 
 
 def request_json(url, headers=None):
@@ -186,13 +180,15 @@ def decode_dbvin(vin):
 
 
 def decode_plan_parts(vin):
-    if not PLAN_PARTS_TOKEN:
+    plan_parts_token = get_setting("api_plan_parts_token")
+
+    if not plan_parts_token:
         raise RuntimeError("Не указан API-ключ plan.parts.")
 
     url = f"https://cdn.plan.parts/api/v1/vin/{quote(vin)}"
 
     headers = {
-        "Authorization": f"Bearer {PLAN_PARTS_TOKEN}",
+        "Authorization": f"Bearer {plan_parts_token}",
         "Accept": "application/json"
     }
 

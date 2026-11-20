@@ -1,7 +1,6 @@
 from pathlib import Path
 from database.connection import get_connection
 
-
 SCHEMA_PATH = Path(__file__).resolve().parent / "scheme.txt"
 
 

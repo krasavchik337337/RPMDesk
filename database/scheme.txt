@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS vehicles (
     model TEXT NOT NULL,
     year INTEGER,
     engine TEXT,
-    license_plate TEXT,
     notes TEXT,
     is_active INTEGER NOT NULL DEFAULT 1
         CHECK (is_active IN (0, 1)),
@@ -62,10 +61,7 @@ CREATE TABLE IF NOT EXISTS service_records (
 CREATE TABLE IF NOT EXISTS work_types (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
-    description TEXT,
-    default_price INTEGER NOT NULL DEFAULT 0
-        CHECK (default_price >= 0)
-
+    description TEXT
 );
 
 
@@ -77,10 +73,6 @@ CREATE TABLE IF NOT EXISTS service_works (
     name TEXT NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1
         CHECK (quantity > 0),
-    unit_price INTEGER NOT NULL
-        CHECK (unit_price >= 0),
-    total_price INTEGER NOT NULL
-        CHECK (total_price >= 0),
 
     FOREIGN KEY (service_record_id)
         REFERENCES service_records(id)
@@ -96,13 +88,10 @@ CREATE TABLE IF NOT EXISTS service_works (
 CREATE TABLE IF NOT EXISTS inventory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    vehicle_make TEXT,
     brand TEXT,
     category TEXT NOT NULL,
     unit TEXT NOT NULL
         CHECK (unit IN ('piece', 'ml')),
-    unit_price INTEGER NOT NULL DEFAULT 0
-        CHECK (unit_price >= 0),
     notes TEXT
 );
 
@@ -122,8 +111,6 @@ CREATE TABLE IF NOT EXISTS stock_movements (
         ),
     quantity INTEGER NOT NULL
         CHECK (quantity > 0),
-    unit_price INTEGER NOT NULL DEFAULT 0
-        CHECK (unit_price >= 0),
     service_record_id INTEGER,
     note TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -146,10 +133,6 @@ CREATE TABLE IF NOT EXISTS used_parts (
     stock_movement_id INTEGER NOT NULL UNIQUE,
     quantity INTEGER NOT NULL
         CHECK (quantity > 0),
-    unit_price INTEGER NOT NULL
-        CHECK (unit_price >= 0),
-    total_price INTEGER NOT NULL
-        CHECK (total_price >= 0),
 
     FOREIGN KEY (service_record_id)
         REFERENCES service_records(id)
@@ -185,9 +168,6 @@ CREATE INDEX IF NOT EXISTS idx_service_records_vehicle
 
 CREATE INDEX IF NOT EXISTS idx_service_records_date
     ON service_records(service_date);
-
-CREATE INDEX IF NOT EXISTS idx_inventory_vehicle_make
-    ON inventory(vehicle_make);
 
 CREATE INDEX IF NOT EXISTS idx_service_works_record
     ON service_works(service_record_id);

@@ -70,3 +70,29 @@ def get_customers_by_name(first_name, last_name):
         con.close()
 
     return customer
+
+
+def deactivate_client(customer_id):
+    con = get_connection()
+
+    try:
+        con.execute("""
+            UPDATE customers
+            SET is_active = 0
+            WHERE id = ?
+        """, (customer_id,))
+
+        con.execute("""
+            UPDATE vehicles
+            SET is_active = 0
+            WHERE customer_id = ?
+        """, (customer_id,))
+
+        con.commit()
+
+    except Exception:
+        con.rollback()
+        raise
+
+    finally:
+        con.close()

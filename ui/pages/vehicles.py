@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, \
     QLineEdit, QLabel, QMessageBox
 from ui.dialogs.vehicle_dialog import VehicleDialog
-from database.vehicles_repository import get_all_vehicles
+from database.vehicles_repository import get_all_vehicles, deactivate_vehicle
 
 
 class VehiclesPage(QWidget):
@@ -26,8 +26,13 @@ class VehiclesPage(QWidget):
         add_button = QPushButton("Добавить автомобиль")
         add_button.clicked.connect(self.open_add_dialog)
 
+        self.deactivate_butto = QPushButton("Удалить автомобиль")
+        self.deactivate_butto.clicked.connect(self.deactivate_vehicle)
+
         top_layout.addWidget(search_label)
         top_layout.addWidget(self.search_input)
+        top_layout.addWidget(self.deactivate_butto)
+
         top_layout.addWidget(add_button)
 
         layout.addLayout(top_layout)
@@ -45,6 +50,15 @@ class VehiclesPage(QWidget):
         ])
         self.table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
+        )
+        self.table.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
+        self.table.setSelectionMode(
+            QTableWidget.SelectionMode.SingleSelection
+        )
+        self.table.setEditTriggers(
+            QTableWidget.EditTrigger.NoEditTriggers
         )
 
         layout.addWidget(self.table)
@@ -97,9 +111,54 @@ class VehiclesPage(QWidget):
                     row, column, QTableWidgetItem(item)
                 )
 
-
     def open_add_dialog(self):
         dialog = VehicleDialog(self)
 
         if dialog.exec():
             self.load_vehicles()
+
+    def deactivate_vehicle(self):
+        row = self.table.currentRow()
+
+        if row < 0:
+            QMessageBox.warning(
+                self,
+                "Предупреждение",
+                "Выберите автомобиль."
+            )
+            return
+
+        vehicle_id = int(
+            self.table.item(row, 0).text()
+        )
+
+        answer = QMessageBox.question(
+            self,
+            "Подтверждение",
+            "Вы действительно хотите деактивировать "
+            "этот автомобиль?",
+            QMessageBox.StandardButton.Yes
+            | QMessageBox.StandardButton.No
+        )
+
+        if answer != QMessageBox.StandardButton.Yes:
+            return
+
+        try:
+            deactivate_vehicle(vehicle_id)
+            self.load_vehicles()
+
+            QMessageBox.information(
+                self,
+                "Успешно",
+                "Автомобиль деактивирован."
+            )
+        except Exception as error:
+            QMessageBox.critical(
+                self,
+                "Ошибка",
+                f"Не удалось деактивировать автомобиль:\n{error}"
+            )
+
+    def refresh_data(self):
+        self.load_vehicles()

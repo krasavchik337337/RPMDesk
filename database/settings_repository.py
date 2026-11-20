@@ -1,18 +1,7 @@
 from database.connection import get_connection
+from config import DEFAULT_SETTINGS
 
 
-DEFAULT_SETTINGS = {
-    "service_name": "",
-    "organization": "",
-    "address": "",
-    "phone": "",
-    "email": "",
-    "theme": "dark",
-    "currency": "RUB",
-    "exchange_rate_usd": "0",
-    "exchange_rate_eur": "0",
-    "low_stock_threshold": "5"
-}
 
 
 def initialize_settings():
@@ -61,6 +50,8 @@ def get_setting(key, default=None):
 
 
 def get_all_settings():
+    settings = DEFAULT_SETTINGS.copy()
+
     con = get_connection()
 
     try:
@@ -71,11 +62,10 @@ def get_all_settings():
             """
         ).fetchall()
 
-        return {
-            row["key"]: row["value"]
-            for row in results
-        }
+        for row in results:
+            settings[row["key"]] = row["value"]
 
+        return settings
     finally:
         con.close()
 
@@ -86,13 +76,12 @@ def set_setting(key, value):
     try:
         con.execute(
             """
-            UPDATE settings 
-            SET value = ? 
-            HERE key = ?
+            INSERT INTO settings (key, value)
+            VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
             """,
-            (str(value), key)
+            (key, str(value)),
         )
-
 
         con.commit()
 
@@ -111,11 +100,11 @@ def set_settings(settings):
         for key, value in settings.items():
             con.execute(
                 """
-                UPDATE settings 
-                SET value = ? 
-                WHERE key = ?
+                INSERT INTO settings (key, value)
+                VALUES (?, ?)
+                ON CONFLICT(KEY) DO UPDATE SET value = excluded.value
                 """,
-                (str(value), key)
+                (key, str(value))
             )
 
         con.commit()
