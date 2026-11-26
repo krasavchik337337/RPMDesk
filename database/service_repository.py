@@ -1,4 +1,3 @@
-import sqlite3
 from database.connection import get_connection
 
 

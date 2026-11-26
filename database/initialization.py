@@ -1,7 +1,7 @@
-from pathlib import Path
 from database.connection import get_connection
+from config import resource_path
 
-SCHEMA_PATH = Path(__file__).resolve().parent / "scheme.txt"
+SCHEMA_PATH = resource_path("database/scheme.txt")
 
 
 def initialize_database():
